@@ -1,5 +1,7 @@
 FROM node:14-buster
 
+RUN sed -i 's/deb.debian.org/archive.debian.org/g; s|security.debian.org|archive.debian.org/debian-security|g' /etc/apt/sources.list
+
 RUN apt-get update && \
     apt-get install -y --no-install-recommends default-jre && \
     rm -rf /var/lib/apt/lists/*
@@ -18,5 +20,10 @@ RUN npm install
 
 # Copy application
 COPY . .
+
+USER root
+RUN find /app/converter/bin -type f -exec sed -i 's/\r$//' {} \; && \
+    chmod +x /app/converter/bin/*
+USER app
 
 CMD ["npm", "start"]
